@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Neuer Honigtopf · HoneyPot{% endblock %}
+{% block content %}
+<div class="form-wrap">
+    <h1>Neuen Honigtopf anlegen</h1>
+    <p class="subtitle">Teile dein Wissen rund um Bienen, Honig und Imkerei mit der Community.</p>
+
+    <form method="POST" action="{{ url_for('new_honigtopf') }}" class="topf-form">
+        <label for="title">Titel</label>
+        <input type="text" id="title" name="title" placeholder="z. B. Schwarmvorbeugung im Frühjahr" required autofocus>
+
+        <label for="content">Inhalt</label>
+        <textarea id="content" name="content" rows="8" placeholder="Beschreibe deinen Tipp oder dein Rezept..." required></textarea>
+
+        <button type="submit" class="btn-primary">Honigtopf veröffentlichen</button>
+    </form>
+</div>
+{% endblock %}

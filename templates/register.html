@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Registrieren · HoneyPot{% endblock %}
+{% block content %}
+<div class="auth-wrap">
+    <div class="auth-card">
+        <div class="auth-icon">🍯</div>
+        <h1>Werde Teil des Schwarms</h1>
+        <p class="auth-sub">Lege ein kostenloses Konto an und teile deine Imker-Tipps.</p>
+
+        <form method="POST" action="{{ url_for('register') }}">
+            <label for="username">Benutzername</label>
+            <input type="text" id="username" name="username" placeholder="Wähle einen Benutzernamen" required autofocus>
+
+            <label for="password">Passwort</label>
+            <input type="password" id="password" name="password" placeholder="Passwort wählen" required>
+
+            <label for="password2">Passwort wiederholen</label>
+            <input type="password" id="password2" name="password2" placeholder="Passwort bestätigen" required>
+
+            <button type="submit" class="btn-primary">Konto erstellen</button>
+        </form>
+
+        <p class="auth-switch">Schon registriert? <a href="{{ url_for('login') }}">Zum Login</a></p>
+    </div>
+</div>
+{% endblock %}

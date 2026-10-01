@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Dashboard · HoneyPot{% endblock %}
+{% block content %}
+<div class="dashboard-header">
+    <h1>Willkommen in deinem Bienenstock, {{ username }} 🐝</h1>
+    <p class="subtitle">Hier findest du alle geteilten Honigtöpfe der Community.</p>
+</div>
+
+<form method="GET" action="{{ url_for('dashboard') }}" class="search-bar">
+    <input type="text" name="q" placeholder="Honigtopf durchsuchen..." value="{{ search }}">
+    <button type="submit" class="btn-secondary">Suchen</button>
+    {% if search %}
+        <a href="{{ url_for('dashboard') }}" class="btn-clear">Zurücksetzen</a>
+    {% endif %}
+</form>
+
+<div class="topf-grid">
+    {% for topf in honigtoepfe %}
+        <a class="topf-card" href="{{ url_for('honigtopf_detail', topf_id=topf['id']) }}">
+            <div class="topf-card-icon">🍯</div>
+            <h3>{{ topf['title'] }}</h3>
+            <span class="topf-date">{{ topf['created_at'] }}</span>
+        </a>
+    {% else %}
+        <p class="empty-state">Noch keine Honigtöpfe gefunden. Leg doch den ersten an!</p>
+    {% endfor %}
+</div>
+{% endblock %}

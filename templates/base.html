@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}HoneyPot{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <a class="nav-brand" href="{{ url_for('index') }}">🍯 HoneyPot</a>
+        <div class="nav-links">
+            {% if session.get('user_id') %}
+                <span class="nav-user">Willkommen, {{ session.get('username') }}</span>
+                <a href="{{ url_for('dashboard') }}">Dashboard</a>
+                <a href="{{ url_for('new_honigtopf') }}">+ Neuer Honigtopf</a>
+                <a href="{{ url_for('logout') }}">Logout</a>
+            {% else %}
+                <a href="{{ url_for('login') }}">Login</a>
+                <a href="{{ url_for('register') }}" class="nav-cta">Registrieren</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <main class="container">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="flash-wrap">
+                    {% for m in messages %}
+                        <div class="flash">{{ m }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="footer">
+        HoneyPot &middot; Die Community für Imker:innen &middot; Übungsumgebung für IT-Security-Training
+    </footer>
+</body>
+</html>

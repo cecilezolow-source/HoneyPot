@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Login · HoneyPot{% endblock %}
+{% block content %}
+<div class="auth-wrap">
+    <div class="auth-card">
+        <div class="auth-icon">🐝</div>
+        <h1>Willkommen zurück</h1>
+        <p class="auth-sub">Melde dich an, um deine Honigtöpfe zu verwalten.</p>
+
+        <form method="POST" action="{{ url_for('login') }}">
+            <label for="username">Benutzername</label>
+            <input type="text" id="username" name="username" placeholder="z. B. imker_tom" required autofocus>
+
+            <label for="password">Passwort</label>
+            <input type="password" id="password" name="password" placeholder="••••••••" required>
+
+            <button type="submit" class="btn-primary">Einloggen</button>
+        </form>
+
+        <p class="auth-switch">Noch kein Konto? <a href="{{ url_for('register') }}">Jetzt registrieren</a></p>
+    </div>
+</div>
+{% endblock %}
