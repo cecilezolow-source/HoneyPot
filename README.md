@@ -1,4 +1,4 @@
-# 🍯 HoneyPot – Die Imker-Community
+# HoneyPot – Die Imker-Community
 
 Eine bewusst unsicher programmierte Übungs-Webseite zum Training von SQL-Injection-Angriffen.
 **Nur für den geschützten Kurs-/Lehrbetrieb bestimmt – niemals öffentlich deployen!**
