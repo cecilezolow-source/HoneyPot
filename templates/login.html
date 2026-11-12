@@ -1,23 +1,53 @@
 {% extends "base.html" %}
 {% block title %}Login · HoneyPot{% endblock %}
+{% block body_class %}page-auth{% endblock %}
 {% block content %}
-<div class="auth-wrap">
-    <div class="auth-card">
-        <div class="auth-icon">🐝</div>
+<div class="auth-split reveal">
+    <section class="auth-showcase">
+        <div class="showcase-hexes" aria-hidden="true">
+            <span></span><span></span><span></span><span></span><span></span>
+        </div>
+        <div class="showcase-content">
+            <span class="eyebrow">Imker-Community</span>
+            <h2>Teile dein Wissen.<br>Ernte neue Ideen.</h2>
+            <ul class="feature-list">
+                <li>Rezepte, Tipps &amp; Anleitungen</li>
+                <li>Saisonales Know-how rund ums Bienenjahr</li>
+                <li>Austausch mit anderen Imker:innen</li>
+            </ul>
+        </div>
+    </section>
+
+    <section class="auth-card">
         <h1>Willkommen zurück</h1>
         <p class="auth-sub">Melde dich an, um deine Honigtöpfe zu verwalten.</p>
 
-        <form method="POST" action="{{ url_for('login') }}">
-            <label for="username">Benutzername</label>
-            <input type="text" id="username" name="username" placeholder="z. B. imker_tom" required autofocus>
+        <form method="POST" action="{{ url_for('login') }}" class="js-loading-form">
+            {# Open Redirect: Ziel wird ungeprueft mitgefuehrt (?next=) #}
+            <input type="hidden" name="next" value="{{ next | default('', true) }}">
+            <div class="field">
+                <input type="text" id="username" name="username" placeholder=" " required autofocus autocomplete="username">
+                <label for="username">Benutzername</label>
+                <svg class="field-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+            </div>
 
-            <label for="password">Passwort</label>
-            <input type="password" id="password" name="password" placeholder="••••••••" required>
+            <div class="field">
+                <input type="password" id="password" name="password" placeholder=" " required autocomplete="current-password">
+                <label for="password">Passwort</label>
+                <svg class="field-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+                <button type="button" class="pw-toggle" aria-label="Passwort anzeigen">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
+                </button>
+            </div>
 
-            <button type="submit" class="btn-primary">Einloggen</button>
+            <button type="submit" class="btn-primary">
+                <span class="btn-label">Einloggen</span>
+                <span class="btn-spinner" aria-hidden="true"></span>
+            </button>
         </form>
 
-        <p class="auth-switch">Noch kein Konto? <a href="{{ url_for('register') }}">Jetzt registrieren</a></p>
-    </div>
+        <p class="auth-switch">Noch kein Konto? <a href="{{ url_for('register') }}">Jetzt registrieren &rarr;</a></p>
+        <p class="auth-switch"><a href="{{ url_for('passwort_vergessen') }}">Passwort vergessen?</a></p>
+    </section>
 </div>
 {% endblock %}

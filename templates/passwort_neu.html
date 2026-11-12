@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Neues Passwort · HoneyPot{% endblock %}
+{% block body_class %}page-auth{% endblock %}
+{% block content %}
+<div class="auth-split reveal">
+    <section class="auth-showcase">
+        <div class="showcase-hexes" aria-hidden="true">
+            <span></span><span></span><span></span><span></span><span></span>
+        </div>
+        <div class="showcase-content">
+            <span class="eyebrow">Imker-Community</span>
+            <h2>Fast geschafft.<br>Neues Passwort setzen.</h2>
+            <ul class="feature-list">
+                <li>Konto: <strong>{{ user }}</strong></li>
+                <li>Token geprüft &amp; gültig</li>
+                <li>Danach direkt einloggen</li>
+            </ul>
+        </div>
+    </section>
+
+    <section class="auth-card">
+        <h1>Neues Passwort</h1>
+        <p class="auth-sub">Vergib ein neues Passwort für <strong>{{ user }}</strong>.</p>
+
+        <form method="POST" action="{{ url_for('passwort_neu', user=user, token=token) }}" class="js-loading-form">
+            <div class="field">
+                <input type="password" id="password" name="password" placeholder=" " required autofocus autocomplete="new-password">
+                <label for="password">Neues Passwort</label>
+                <svg class="field-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+            </div>
+
+            <button type="submit" class="btn-primary">
+                <span class="btn-label">Passwort speichern</span>
+                <span class="btn-spinner" aria-hidden="true"></span>
+            </button>
+        </form>
+
+        <p class="auth-switch">Zurück zum <a href="{{ url_for('login') }}">Login &rarr;</a></p>
+    </section>
+</div>
+{% endblock %}

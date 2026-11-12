@@ -5,39 +5,140 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}HoneyPot{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="{{ url_for('static', filename='app.js') }}" defer></script>
 </head>
-<body>
-    <nav class="navbar">
-        <a class="nav-brand" href="{{ url_for('index') }}">🍯 HoneyPot</a>
-        <div class="nav-links">
-            {% if session.get('user_id') %}
-                <span class="nav-user">Willkommen, {{ session.get('username') }}</span>
-                <a href="{{ url_for('dashboard') }}">Dashboard</a>
-                <a href="{{ url_for('new_honigtopf') }}">+ Neuer Honigtopf</a>
-                <a href="{{ url_for('logout') }}">Logout</a>
+<body class="{% block body_class %}{% endblock %}">
+    <!--
+        Hinweis an das Dev-Team (bitte vor dem Go-Live entfernen!):
+        - Wachbienen (WAF) sind noch im Winterschlaf.
+        - Admin-Kram liegt laut imker_tom "irgendwo, wo Crawler nicht hindürfen".
+    -->
+    <div class="bg-comb" aria-hidden="true"></div>
+
+    <header class="navbar">
+        <a class="nav-brand" href="{{ url_for('index') }}">
+            <span class="brand-hex">🍯</span>
+            <span class="brand-text">Honey<span>Pot</span></span>
+        </a>
+
+        <button class="nav-toggle" type="button" aria-label="Menü öffnen" aria-expanded="false">
+            <span></span><span></span><span></span>
+        </button>
+
+        <nav class="nav-links">
+            {% if current_user %}
+                <a href="{{ url_for('dashboard') }}" class="{% if request.endpoint == 'dashboard' %}active{% endif %}">Dashboard</a>
+                <button type="button" class="nav-challenges js-open-challenges">
+                    Challenges <span class="challenge-badge js-challenge-badge" hidden></span>
+                </button>
+                <a href="{{ url_for('fotos') }}" class="{% if request.endpoint == 'fotos' %}active{% endif %}">Fotos</a>
+                <a href="{{ url_for('etikett_designer') }}" class="{% if request.endpoint == 'etikett_designer' %}active{% endif %}">Etiketten</a>
+                <a href="{{ url_for('new_honigtopf') }}" class="nav-cta">
+                    <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" fill="none"/></svg>
+                    Neuer Honigtopf
+                </a>
+                <div class="nav-user">
+                    <span class="avatar">{{ (current_user.username or '?')[:1] | upper }}</span>
+                    <span class="nav-user-name">{{ current_user.username }}</span>
+                </div>
+                <a href="{{ url_for('logout') }}" class="nav-logout" title="Logout">
+                    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+                    <span>Logout</span>
+                </a>
             {% else %}
-                <a href="{{ url_for('login') }}">Login</a>
+                <a href="{{ url_for('login') }}" class="{% if request.endpoint == 'login' %}active{% endif %}">Login</a>
                 <a href="{{ url_for('register') }}" class="nav-cta">Registrieren</a>
             {% endif %}
-        </div>
-    </nav>
+        </nav>
+    </header>
+
+    <div class="toast-stack" aria-live="polite"></div>
 
     <main class="container">
         {% with messages = get_flashed_messages() %}
             {% if messages %}
-                <div class="flash-wrap">
+                <div class="flash-list">
                     {% for m in messages %}
-                        <div class="flash">{{ m }}</div>
+                        {% if m is mapping %}
+                            <div class="flash flash-tipp" role="status">
+                                <span>{{ m.tipp }}</span>
+                                <code class="flash-sql">{{ m.sql }}</code>
+                            </div>
+                        {% else %}
+                            <div class="flash" role="status">{{ m }}</div>
+                        {% endif %}
                     {% endfor %}
                 </div>
             {% endif %}
         {% endwith %}
-
         {% block content %}{% endblock %}
     </main>
 
+    {% if current_user %}
+    <div class="challenge-overlay js-challenge-overlay" hidden>
+        <div class="challenge-modal" role="dialog" aria-modal="true" aria-labelledby="challenge-titel">
+            <header class="challenge-head">
+                <div>
+                    <span class="eyebrow">Übungsaufgaben</span>
+                    <h2 id="challenge-titel">Challenges</h2>
+                </div>
+                <button type="button" class="challenge-close js-close-challenges" aria-label="Schließen">&times;</button>
+            </header>
+
+            <div class="challenge-progress">
+                <div class="challenge-bar"><span class="js-challenge-fill"></span></div>
+                <span class="js-challenge-count">0 / 0 gelöst</span>
+            </div>
+
+            <ul class="challenge-list">
+                {% set challenges = [
+                    {"id": "c1", "titel": "Challenge 1 — Anmelden ohne Benutzer und Passwort",
+                     "text": "Logge dich ein, ohne gültige Zugangsdaten zu kennen.",
+                     "tipp": "Schreib ins Benutzerfeld <code>' OR 1=1 -- </code> (Leerzeichen am Ende), Passwort egal."},
+                    {"id": "c2", "titel": "Challenge 2 — Als imker_tom anmelden – ohne Passwort",
+                     "text": "Übernimm gezielt das imker_tom-Konto, ohne das Passwort zu kennen.",
+                     "tipp": "Benutzerfeld <code>imker_tom' -- </code> (Leerzeichen am Ende), Passwort egal."},
+                    {"id": "c3", "titel": "Challenge 3 — Eigenen Code einschleusen (Stored XSS)",
+                     "text": "Lege einen Beitrag an, dessen Inhalt beim Öffnen Code ausführt (z. B. ein Pop-up).",
+                     "tipp": "Der Inhalt wird als HTML gerendert. Probier ein <code>&lt;script&gt;</code>-Schnipsel – aber ohne einfache Anführungszeichen ('), sonst bricht das Speichern ab."},
+                    {"id": "c4", "titel": "Challenge 4 — Passwörter über das Suchfeld abgreifen (UNION-SQLi)",
+                     "text": "Bring das Suchfeld im Dashboard dazu, Benutzernamen und Passwörter anzuzeigen.",
+                     "tipp": "Mit <code>UNION SELECT</code> eigene Spalten unterschieben – die Suche hat 3 Spalten, deine Auswahl muss genauso viele haben. Payload mit <code>%'</code> beginnen, mit <code>-- </code> beenden."},
+                    {"id": "c5", "titel": "Challenge 5 — Fremde Dateien vom Server lesen (Path Traversal)",
+                     "text": "Der Etikett-Download liefert Dateien aus einem Ordner aus. Lies darüber eine Datei, die dort nicht liegt (z. B. den Quellcode).",
+                     "tipp": "Schau dir <code>/etikett?datei=akazie.txt</code> an. Wie kommst du mit <code>../</code> aus dem Ordner heraus?"},
+                    {"id": "c7", "titel": "Challenge 6 — Datei wird zur Waffe (Unrestricted File Upload)",
+                     "text": "Unter Fotos kann man Bienenfotos hochladen. Lade eine Datei hoch, die beim Öffnen JavaScript im App-Kontext ausführt und das auth-Cookie anzeigt.",
+                     "tipp": "Prüft der Server wirklich, ob es ein Bild ist? Welcher Content-Type kommt zurück, wenn du die hochgeladene Datei öffnest?"}
+                ] %}
+                {% for c in challenges %}
+                    <li class="challenge-item">
+                        <label class="challenge-check">
+                            <input type="checkbox" class="js-challenge-box" data-id="{{ c.id }}">
+                            <span class="challenge-tick" aria-hidden="true"></span>
+                        </label>
+                        <div class="challenge-body">
+                            <h3>{{ c.titel }}</h3>
+                            <p>{{ c.text }}</p>
+                            <p class="challenge-tipp"><strong>Tipp:</strong> {{ c.tipp | safe }}</p>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+
+            <footer class="challenge-foot">
+                <button type="button" class="btn-secondary js-challenge-reset">Fortschritt zurücksetzen</button>
+            </footer>
+        </div>
+    </div>
+    {% endif %}
+
     <footer class="footer">
-        HoneyPot &middot; Die Community für Imker:innen &middot; Übungsumgebung für IT-Security-Training
+        <div class="footer-inner">
+            <span class="footer-brand">HoneyPot</span>
+            <span>Die Community für Imker:innen</span>
+            <span class="footer-badge">Übungsumgebung · IT-Security-Training</span>
+        </div>
     </footer>
 </body>
 </html>

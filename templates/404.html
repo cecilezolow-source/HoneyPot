@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Leere Wabe · HoneyPot{% endblock %}
+{% block content %}
+<div class="notfound reveal">
+    <div class="notfound-code">404</div>
+    <h1>Diese Wabe ist leer.</h1>
+    <p class="subtitle">Hier gibt es keinen Honig – nur ein paar verirrte Bienen. Vielleicht hat jemand die URL angeknabbert?</p>
+    <a href="{{ url_for('index') }}" class="btn-primary btn-inline">Zurück in den Bienenstock</a>
+    <p class="notfound-hint">Tipp für Neugierige: Fehlerseiten verraten manchmal mehr als gedacht. Diese hier nicht. Andere schon.</p>
+</div>
+{% endblock %}

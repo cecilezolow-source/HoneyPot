@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.pyc
+venv/
+.venv/
+
+# Editor
+.vscode/
+static/.vscode/
+
+# Laufzeit-Daten (werden vom Server erzeugt)
+uploads/
+geklaute_cookies.log
+*.log
+
+# Lokale Notizen / Scratch
+scriptalert(xss)script.txt
+
+# Lösungswege/Flags – nur lokal, nicht veröffentlichen
+LOESUNGEN.md

@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}{% if erwischt %}Erwischt! · HoneyPot{% else %}Honigkeller · Admin{% endif %}{% endblock %}
+{% block body_class %}page-keller{% endblock %}
+{% block content %}
+{% if not erwischt %}
+<!-- Psst. Hier ist der echte Admin-Zugang. Ganz bestimmt. Kein Trick. -->
+<div class="keller-wrap reveal">
+    <section class="keller-card">
+        <span class="eyebrow">Interner Bereich</span>
+        <h1>Honigkeller – Admin-Konsole</h1>
+        <p class="subtitle">Nur für die Königin und autorisierte Imker:innen. Alle anderen: bitte weitersummen.</p>
+
+        <form method="POST" action="{{ url_for('honigkeller') }}">
+            <div class="field">
+                <input type="text" id="k-user" name="username" placeholder=" " required autocomplete="off">
+                <label for="k-user">Admin-Benutzer</label>
+                <svg class="field-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+            </div>
+            <div class="field">
+                <input type="password" id="k-pass" name="password" placeholder=" " required autocomplete="off">
+                <label for="k-pass">Master-Passwort</label>
+                <svg class="field-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+            </div>
+            <button type="submit" class="btn-primary">Tresor öffnen</button>
+        </form>
+        <p class="keller-foot">Verbindung: <code>honigkeller-01.intern</code> · Build 0.9.3-beta</p>
+    </section>
+</div>
+{% else %}
+<div class="keller-wrap reveal">
+    <section class="keller-card gotcha">
+        <span class="eyebrow">Honeypot ausgelöst</span>
+        <h1>Erwischt! Du steckst im Honigtopf.</h1>
+        <p class="subtitle">
+            Dieser „Admin-Bereich“ war nie echt. Er ist ein <strong>Honeypot</strong>: ein Köder, der nur
+            dazu da ist, Angreifer:innen anzulocken und zu beobachten. Genau wie Bären, die den Honig nicht
+            liegen lassen können.
+        </p>
+
+        <div class="gotcha-log">
+            <div class="gotcha-log-head">
+                <span></span><span></span><span></span>
+                <em>honeypot.log</em>
+            </div>
+<pre>[ALARM] Zugriff auf Köder-Endpunkt /honigkeller
+  benutzer    = {{ erwischt.username }}
+  passwort    = {{ '•' * erwischt.pw_laenge }} ({{ erwischt.pw_laenge }} Zeichen)
+  ip          = {{ erwischt.ip }}
+  user_agent  = {{ erwischt.user_agent }}
+  quelle      = robots.txt gelesen? Sehr wahrscheinlich.
+  aktion      = Schwarm alarmiert</pre>
+        </div>
+
+        <div class="gotcha-note">
+            <strong>Keine Sorge:</strong> In dieser Übung wird <em>nichts</em> gespeichert. Ein echter Honeypot würde
+            diese Daten aber jetzt protokollieren und das Security-Team alarmieren.
+        </div>
+
+        <h2>Was lernen wir daraus?</h2>
+        <ul class="lesson-list">
+            <li><code>robots.txt</code> ist kein Schutz, sondern eher eine Schatzkarte für Angreifer:innen.</li>
+            <li>Verteidiger:innen nutzen genau das aus und legen gezielt Köder aus.</li>
+            <li>Der echte Schatz liegt woanders … vielleicht in einer Tabelle, die die App nie benutzt?</li>
+        </ul>
+
+        <a href="{{ url_for('index') }}" class="btn-primary btn-inline">Zurück in den Bienenstock</a>
+    </section>
+</div>
+{% endif %}
+{% endblock %}

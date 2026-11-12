@@ -1,28 +1,106 @@
 {% extends "base.html" %}
 {% block title %}Dashboard · HoneyPot{% endblock %}
 {% block content %}
-<div class="dashboard-header">
-    <h1>Willkommen in deinem Bienenstock, {{ username }} 🐝</h1>
-    <p class="subtitle">Hier findest du alle geteilten Honigtöpfe der Community.</p>
-</div>
+{% set sorten_im_regal = honigtoepfe | map(attribute='sorte') | unique | list %}
 
-<form method="GET" action="{{ url_for('dashboard') }}" class="search-bar">
-    <input type="text" name="q" placeholder="Honigtopf durchsuchen..." value="{{ search }}">
-    <button type="submit" class="btn-secondary">Suchen</button>
-    {% if search %}
-        <a href="{{ url_for('dashboard') }}" class="btn-clear">Zurücksetzen</a>
-    {% endif %}
-</form>
+<section class="hero reveal">
+    <div class="hero-text">
+        <span class="eyebrow js-greeting">Hallo</span>
+        <h1>Willkommen in deinem Bienenstock, <span class="highlight">{{ username }}</span></h1>
+        <p class="subtitle">Alle geteilten Honigtöpfe der Community – Tipps, Rezepte und Anleitungen.</p>
+    </div>
+    <a href="{{ url_for('new_honigtopf') }}" class="btn-primary btn-inline">
+        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" fill="none"/></svg>
+        Honigtopf anlegen
+    </a>
+</section>
+
+<section class="stats reveal">
+    <div class="stat">
+        <span class="stat-value">{{ honigtoepfe | length }}</span>
+        <span class="stat-label">{% if search %}Treffer{% else %}Honigtöpfe{% endif %}</span>
+    </div>
+    <div class="stat">
+        <span class="stat-value">{{ sorten_im_regal | length }}<small> / {{ SORTEN | length }}</small></span>
+        <span class="stat-label">Honigsorten vertreten</span>
+    </div>
+    <div class="stat">
+        <span class="stat-value stat-small js-reldate" data-date="{{ honigtoepfe[0]['created_at'] if honigtoepfe else '' }}">{{ honigtoepfe[0]['created_at'] if honigtoepfe else '–' }}</span>
+        <span class="stat-label">Zuletzt hinzugefügt</span>
+    </div>
+</section>
+
+<section class="toolbar reveal">
+    <form method="GET" action="{{ url_for('dashboard') }}" class="search-bar">
+        <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+        <input type="text" name="q" placeholder="Honigtöpfe durchsuchen…" value="{{ search }}" autocomplete="off">
+        {% if search %}
+            <a href="{{ url_for('dashboard') }}" class="btn-clear" title="Suche zurücksetzen">&times;</a>
+        {% endif %}
+        <button type="submit" class="btn-secondary">Suchen</button>
+    </form>
+
+    <div class="view-controls">
+        <select class="sort-select" aria-label="Sortierung">
+            <option value="new">Neueste zuerst</option>
+            <option value="old">Älteste zuerst</option>
+            <option value="az">Titel A–Z</option>
+            <option value="za">Titel Z–A</option>
+        </select>
+        <div class="segmented" role="group" aria-label="Ansicht">
+            <button type="button" class="view-btn active" data-view="grid" title="Kachelansicht">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+            </button>
+            <button type="button" class="view-btn" data-view="list" title="Listenansicht">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13"/><circle cx="3.5" cy="6" r="1"/><circle cx="3.5" cy="12" r="1"/><circle cx="3.5" cy="18" r="1"/></svg>
+            </button>
+        </div>
+    </div>
+</section>
+
+{% if honigtoepfe %}
+<div class="filter-row" role="group" aria-label="Nach Kategorie filtern">
+    <button type="button" class="filter-chip active" data-filter="alle">Alle <span>{{ honigtoepfe | length }}</span></button>
+    {% for key, k in KATEGORIEN.items() %}
+        {% set anzahl = honigtoepfe | selectattr('kategorie', 'equalto', key) | list | length %}
+        {% if anzahl %}
+            <button type="button" class="filter-chip" data-filter="{{ key }}">{{ k.name }} <span>{{ anzahl }}</span></button>
+        {% endif %}
+    {% endfor %}
+</div>
+{% endif %}
+
+{% if search %}
+    {# !!! SCHWACHSTELLE 14: REFLECTED XSS – "| safe" schaltet das Escaping ab.
+       Der Suchbegriff aus ?q= landet als echtes HTML in der Seite, z. B.
+       /dashboard?q=<img src=x onerror=alert(1337)>  – Fix: "| safe" entfernen. #}
+    <p class="search-info">Ergebnisse für „<strong>{{ search | safe }}</strong>“</p>
+{% endif %}
 
 <div class="topf-grid">
     {% for topf in honigtoepfe %}
-        <a class="topf-card" href="{{ url_for('honigtopf_detail', topf_id=topf['id']) }}">
-            <div class="topf-card-icon">🍯</div>
+        {% set sorte = SORTEN[topf['sorte']] %}
+        <a class="topf-card" href="{{ url_for('honigtopf_detail', topf_id=topf['id']) }}"
+           data-title="{{ topf['title'] }}" data-index="{{ loop.index0 }}" data-kategorie="{{ topf['kategorie'] }}"
+           style="--i: {{ loop.index0 }}; --honey: {{ sorte.farbe }}">
+            <div class="card-top">
+                <span class="kat-badge">{{ KATEGORIEN[topf['kategorie']].name }}</span>
+                <span class="topf-id">#{{ topf['id'] }}</span>
+            </div>
             <h3>{{ topf['title'] }}</h3>
-            <span class="topf-date">{{ topf['created_at'] }}</span>
+            <span class="sorte-name"><i></i>{{ sorte.name }}</span>
+            <div class="topf-card-foot">
+                <span class="topf-date js-reldate" data-date="{{ topf['created_at'] }}">{{ topf['created_at'] }}</span>
+                <span class="topf-more">Lesen <span aria-hidden="true">→</span></span>
+            </div>
         </a>
     {% else %}
-        <p class="empty-state">Noch keine Honigtöpfe gefunden. Leg doch den ersten an!</p>
+        <div class="empty-state">
+            <h3>Keine Honigtöpfe gefunden</h3>
+            <p>{% if search %}Versuch es mit einem anderen Suchbegriff.{% else %}Leg doch den ersten an!{% endif %}</p>
+            <a href="{{ url_for('new_honigtopf') }}" class="btn-primary btn-inline">Honigtopf anlegen</a>
+        </div>
     {% endfor %}
 </div>
+<p class="filter-empty" hidden>In dieser Kategorie gibt es gerade keine Honigtöpfe.</p>
 {% endblock %}

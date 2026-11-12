@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Etiketten-Designer · HoneyPot{% endblock %}
+{% block content %}
+<a href="{{ url_for('dashboard') }}" class="back-link">
+    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M19 12H5M11 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+    Zurück zum Dashboard
+</a>
+
+<div class="editor reveal">
+    <section class="form-wrap">
+        <span class="eyebrow">Werkzeug</span>
+        <h1>Etiketten-Designer</h1>
+        <p class="subtitle">Gestalte ein Etikett für dein Honigglas – mit dem Namen deiner Imkerei.</p>
+
+        <form method="GET" action="{{ url_for('etikett_designer') }}">
+            <fieldset class="step">
+                <legend><span class="step-num">1</span> Honigsorte</legend>
+                <select class="plain-input" name="sorte">
+                    {% for key, s in SORTEN.items() %}
+                        <option value="{{ key }}" {% if key == sorte %}selected{% endif %}>{{ s.name }}</option>
+                    {% endfor %}
+                </select>
+            </fieldset>
+            <fieldset class="step">
+                <legend><span class="step-num">2</span> Name der Imkerei</legend>
+                <input class="plain-input" type="text" name="imkerei" value="{{ imkerei }}" placeholder="z. B. Imkerei Summsemann" required>
+                <button type="submit" class="btn-primary">Etikett erstellen</button>
+            </fieldset>
+        </form>
+    </section>
+
+    <aside class="form-wrap">
+        <span class="eyebrow">Vorschau</span>
+        {% if fehler %}
+            <div class="flash">{{ fehler }}</div>
+        {% elif etikett %}
+            <pre class="etikett-vorschau" style="--honey: {{ SORTEN[sorte].farbe }}">{{ etikett }}</pre>
+        {% else %}
+            <p class="subtitle">Gib links den Namen deiner Imkerei ein.</p>
+        {% endif %}
+    </aside>
+</div>
+{% endblock %}

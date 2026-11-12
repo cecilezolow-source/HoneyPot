@@ -1,26 +1,62 @@
 {% extends "base.html" %}
 {% block title %}Registrieren · HoneyPot{% endblock %}
+{% block body_class %}page-auth{% endblock %}
 {% block content %}
-<div class="auth-wrap">
-    <div class="auth-card">
-        <div class="auth-icon">🍯</div>
-        <h1>Werde Teil des Schwarms</h1>
-        <p class="auth-sub">Lege ein kostenloses Konto an und teile deine Imker-Tipps.</p>
+<div class="auth-split reveal">
+    <section class="auth-showcase">
+        <div class="showcase-hexes" aria-hidden="true">
+            <span></span><span></span><span></span><span></span><span></span>
+        </div>
+        <div class="showcase-content">
+            <span class="eyebrow">Mitmachen</span>
+            <h2>Werde Teil<br>des Schwarms.</h2>
+            <ul class="feature-list">
+                <li>Kostenloses Konto in Sekunden</li>
+                <li>Eigene Honigtöpfe veröffentlichen</li>
+                <li>Alle Beiträge durchsuchen</li>
+            </ul>
+        </div>
+    </section>
 
-        <form method="POST" action="{{ url_for('register') }}">
-            <label for="username">Benutzername</label>
-            <input type="text" id="username" name="username" placeholder="Wähle einen Benutzernamen" required autofocus>
+    <section class="auth-card">
+        <h1>Konto erstellen</h1>
+        <p class="auth-sub">Lege ein Konto an und teile deine Imker-Tipps.</p>
 
-            <label for="password">Passwort</label>
-            <input type="password" id="password" name="password" placeholder="Passwort wählen" required>
+        <form method="POST" action="{{ url_for('register') }}" class="js-loading-form js-register-form">
+            <div class="field">
+                <input type="text" id="username" name="username" placeholder=" " required autofocus autocomplete="username">
+                <label for="username">Benutzername</label>
+                <svg class="field-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+            </div>
 
-            <label for="password2">Passwort wiederholen</label>
-            <input type="password" id="password2" name="password2" placeholder="Passwort bestätigen" required>
+            <div class="field">
+                <input type="password" id="password" name="password" placeholder=" " required autocomplete="new-password">
+                <label for="password">Passwort</label>
+                <svg class="field-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+                <button type="button" class="pw-toggle" aria-label="Passwort anzeigen">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
+                </button>
+            </div>
 
-            <button type="submit" class="btn-primary">Konto erstellen</button>
+            <div class="strength" aria-live="polite">
+                <div class="strength-bar"><span></span><span></span><span></span><span></span></div>
+                <span class="strength-label">Passwortstärke</span>
+            </div>
+
+            <div class="field">
+                <input type="password" id="password2" name="password2" placeholder=" " required autocomplete="new-password">
+                <label for="password2">Passwort wiederholen</label>
+                <svg class="field-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg>
+            </div>
+            <p class="match-hint" hidden>Die Passwörter stimmen nicht überein.</p>
+
+            <button type="submit" class="btn-primary">
+                <span class="btn-label">Konto erstellen</span>
+                <span class="btn-spinner" aria-hidden="true"></span>
+            </button>
         </form>
 
-        <p class="auth-switch">Schon registriert? <a href="{{ url_for('login') }}">Zum Login</a></p>
-    </div>
+        <p class="auth-switch">Schon registriert? <a href="{{ url_for('login') }}">Zum Login &rarr;</a></p>
+    </section>
 </div>
 {% endblock %}
