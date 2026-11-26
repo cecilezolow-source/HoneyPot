@@ -1,12 +1,11 @@
 # HoneyPot – Die Imker-Community
 
 Eine bewusst unsicher programmierte Übungs-Webseite zum Training von SQL-Injection-Angriffen.
-**Nur für den geschützten Kurs-/Lehrbetrieb bestimmt – niemals öffentlich deployen!**
+**Nur für den geschützten Kurs – niemals öffentlich deployen!**
 
 Statt eines Ticketsystems ist HoneyPot eine kleine Community-Plattform für Imker:innen:
 Nutzer registrieren sich, loggen sich ein und teilen "Honigtöpfe" (Tipps, Rezepte, Anleitungen
-rund um Bienen & Honig). Der Begriff "HoneyPot" ist dabei bewusst doppeldeutig gewählt – in der
-IT-Security bezeichnet ein "Honeypot" eine Lockfalle für Angreifer.
+rund um Bienen & Honig). 
 
 ## Setup
 
